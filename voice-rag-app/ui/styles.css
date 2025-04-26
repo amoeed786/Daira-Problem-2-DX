@@ -1,0 +1,61 @@
+/* ui/styles.css */
+/* Additional styling beyond Tailwind */
+
+.animate-pulse {
+    animation: pulse 1.5s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@keyframes pulse {
+    0%, 100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.5;
+    }
+}
+
+.recording #hold-to-speak {
+    background-color: #ef4444; /* red-500 */
+    transform: scale(1.1);
+}
+
+details.context-details {
+    transition: all 0.3s;
+}
+
+details.context-details summary {
+    list-style: none;
+    display: flex;
+    align-items: center;
+}
+
+details.context-details summary::before {
+    content: "▶";
+    display: inline-block;
+    margin-right: 0.5rem;
+    transition: transform 0.2s;
+    font-size: 0.7rem;
+}
+
+details.context-details[open] summary::before {
+    transform: rotate(90deg);
+}
+
+.context-text {
+    white-space: pre-wrap;
+    overflow-wrap: break-word;
+}
+
+/* Loading spinner */
+.spinner {
+    width: 1.5rem;
+    height: 1.5rem;
+    border: 3px solid rgba(255, 255, 255, 0.3);
+    border-radius: 50%;
+    border-top-color: white;
+    animation: spin 1s ease-in-out infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}

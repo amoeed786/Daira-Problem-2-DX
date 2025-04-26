@@ -1,0 +1,17 @@
+fastapi
+uvicorn
+python-multipart
+numpy
+PyMuPDF
+sentence-transformers
+chromadb
+transformers
+soundfile
+torchaudio
+pyttsx3
+python-jose
+torch
+langchain
+langchain-text-splitters
+pydantic
+websockets

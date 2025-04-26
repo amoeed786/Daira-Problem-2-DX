@@ -1,0 +1,131 @@
+<!-- ui/index.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Voice RAG System</title>
+    <link rel="stylesheet" href="/static/styles.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 min-h-screen">
+    <div class="container mx-auto px-4 py-8">
+        <header class="text-center mb-10">
+            <h1 class="text-3xl font-bold text-blue-700">Voice-Interactive RAG System</h1>
+            <p class="text-gray-600">Upload a PDF, ask questions using your voice, and get AI-powered answers</p>
+        </header>
+
+        <div class="grid grid-cols-1 lg:grid-cols-5 gap-6">
+            <!-- Left Column: Upload & Controls -->
+            <div class="lg:col-span-2 bg-white rounded-lg shadow-md p-6">
+                <div id="upload-section" class="mb-8">
+                    <h2 class="text-xl font-semibold mb-4">Upload Document</h2>
+                    <div class="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center">
+                        <input type="file" id="pdf-upload" accept=".pdf" class="hidden" />
+                        <label for="pdf-upload" class="cursor-pointer block">
+                            <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
+                            </svg>
+                            <span class="mt-2 block text-sm font-medium text-gray-700">
+                                Select a PDF file to upload
+                            </span>
+                        </label>
+                    </div>
+                    <div id="upload-status" class="mt-3 text-center text-sm hidden"></div>
+                </div>
+
+                <div id="voice-controls" class="mb-8 hidden">
+                    <h2 class="text-xl font-semibold mb-4">Ask a Question</h2>
+                    <div class="text-center">
+                        <button id="hold-to-speak" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 px-6 rounded-full shadow-lg transition-all w-32 h-32 flex items-center justify-center">
+                            <svg id="mic-icon" class="h-10 w-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"></path>
+                            </svg>
+                            <svg id="recording-icon" class="h-10 w-10 hidden animate-pulse" fill="red" viewBox="0 0 24 24">
+                                <circle cx="12" cy="12" r="8" />
+                            </svg>
+                        </button>
+                        <p class="mt-3 text-sm text-gray-600">Hold to speak, release when done</p>
+                    </div>
+                    <div id="transcript-display" class="mt-4 p-3 bg-gray-100 rounded-lg min-h-16 hidden">
+                        <p class="text-gray-700 italic"></p>
+                    </div>
+                </div>
+
+                <div id="summary-section" class="hidden">
+                    <h2 class="text-xl font-semibold mb-4">Document Summary</h2>
+                    <div class="bg-gray-50 p-4 rounded-lg mb-4">
+                        <p id="summary-text" class="text-sm text-gray-700"></p>
+                    </div>
+                    <div class="flex justify-center">
+                        <button id="play-summary" class="bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-md flex items-center">
+                            <svg class="h-4 w-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"></path>
+                                <path stroke-linecap="round" stroke-linej
+                                <!-- ui/index.html (continued) -->
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"></path>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                            </svg>
+                            Play Summary
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Column: Results -->
+            <div class="lg:col-span-3 bg-white rounded-lg shadow-md p-6">
+                <div id="results-section" class="hidden">
+                    <h2 class="text-xl font-semibold mb-4">Results</h2>
+                    
+                    <div id="no-results" class="text-center py-16">
+                        <p class="text-gray-500">Ask a question about the document to see results here</p>
+                    </div>
+                    
+                    <div id="qa-container" class="space-y-6 hidden">
+                        <!-- QA pairs will be added here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Templates for dynamic content -->
+    <template id="qa-template">
+        <div class="qa-item border-b border-gray-200 pb-6">
+            <div class="query-container mb-3">
+                <h3 class="text-md font-medium text-gray-700">Q: <span class="query-text"></span></h3>
+            </div>
+            <div class="answer-container bg-blue-50 p-4 rounded-md mb-3">
+                <p class="answer-text text-gray-800"></p>
+                <div class="flex justify-end mt-2">
+                    <button class="play-answer bg-blue-600 hover:bg-blue-700 text-white text-sm py-1 px-3 rounded-md flex items-center">
+                        <svg class="h-3 w-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"></path>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                        Play
+                    </button>
+                </div>
+            </div>
+            <div class="context-container">
+                <details class="context-details">
+                    <summary class="text-sm text-blue-600 cursor-pointer">Show retrieved context</summary>
+                    <div class="context-list mt-2 space-y-2 pl-4 text-sm text-gray-600">
+                        <!-- Context items will be added here -->
+                    </div>
+                </details>
+            </div>
+        </div>
+    </template>
+
+    <template id="context-item-template">
+        <div class="context-item p-2 bg-gray-50 rounded border border-gray-200">
+            <p class="context-text"></p>
+        </div>
+    </template>
+
+    <audio id="audio-player" class="hidden"></audio>
+
+    <script src="/static/app.js"></script>
+</body>
+</html>
